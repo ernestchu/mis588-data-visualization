@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<!--
+Group:
+  - B073040018 朱劭璿
+  - B061020047 郭佳偲
+Reference:
+  - https://www.d3-graph-gallery.com/graph/line_select.html
+  - https://www.d3-graph-gallery.com/graph/scatter_basic.html
+  - https://bl.ocks.org/guilhermesimoes/15ed216d14175d8165e6
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <title></title>
+  </head>
+  <body>
+    <select id="selectButton"></select>
+    <div id="my_dataviz"></div>
+    <script>
+      const scales = [
+        { text: 'Scale from 0 to Max', value: 0 },
+        { text: 'Scale with data range', value: 1 }
+      ]
+
+      // add the options to the button
+      d3.select('#selectButton')
+        .selectAll('myOptions')
+        .data(scales)
+        .enter()
+        .append('option')
+        .text(d => d.text) // text showed in the menu
+        .attr('value', d => d.value) // corresponding value returned by the button
+
+      // set the dimensions and margins of the graph
+      const margin = { top: 10, right: 30, bottom: 30, left: 60 },
+        width = 460 - margin.left - margin.right,
+        height = 400 - margin.top - margin.bottom
+
+      // append the svg object to the body of the page
+      const svg = d3
+        .select('#my_dataviz')
+        .append('svg')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom)
+        .append('g')
+        .attr('transform', `translate(${margin.left}, ${margin.top})`)
+
+      //Read the data
+      d3.csv('data2.csv').then(data => {
+        // Add X axis
+        const x = d3.scaleLinear().domain([1, 10]).range([0, width])
+        svg
+          .append('g')
+          .attr('transform', `translate(0, ${height})`)
+          .call(d3.axisBottom(x))
+
+        // Add Y axis
+        const ys = [
+          d3
+            .scaleLinear()
+            .domain([0, d3.max(data.map(d => d.value))])
+            .range([height, 0]),
+
+          d3
+            .scaleLinear()
+            .domain([
+              d3.min(data.map(d => d.value)),
+              d3.max(data.map(d => d.value))
+            ])
+            .range([height, 0])
+        ]
+
+        const y = ys[0]
+
+        const yAxis = svg.append('g').call(d3.axisLeft(y))
+
+        // Add dots
+        const dots = svg
+          .append('g')
+          .selectAll()
+          .data(data)
+          .join('circle')
+          .attr('cx', function (d) {
+            return x(d.time)
+          })
+          .attr('cy', function (d) {
+            return y(d.value)
+          })
+          .attr('r', 3)
+          .style('fill', 'steelblue')
+
+        // Add line
+        const line = svg
+          .append('g')
+          .append('path')
+          .datum(data)
+          .attr(
+            'd',
+            d3
+              .line()
+              .x(d => x(+d.time))
+              .y(d => y(+d.value))
+          )
+          .attr('stroke', 'steelblue')
+          .style('stroke-width', 2)
+          .style('fill', 'none')
+
+        document.getElementById('selectButton').addEventListener(
+          'change',
+          e => {
+            // change the y scale
+            const y = ys[e.target.value]
+
+            // update axis
+            yAxis.transition().duration(1000).call(d3.axisLeft(y))
+
+            // update dots
+            dots
+              .data(data)
+              .transition()
+              .duration(1000)
+              .attr('cy', function (d) {
+                return y(d.value)
+              })
+
+            // update line
+            line
+              .datum(data)
+              .transition()
+              .duration(1000)
+              .attr(
+                'd',
+                d3
+                  .line()
+                  .x(d => x(+d.time))
+                  .y(d => y(+d.value))
+              )
+          },
+          false
+        )
+      })
+    </script>
+  </body>
+</html>
