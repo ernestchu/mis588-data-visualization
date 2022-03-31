@@ -24,4 +24,3 @@ yarn http-server
 ```
 yarn prettier --write .
 ```
-``
