@@ -1,67 +1,71 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
-
+    <meta charset="utf-8">
+              
     <!-- Load d3.js -->
     <script src="https://d3js.org/d3.v6.js"></script>
-  </head>
+  </head>  
   <body>
     <!-- Create a div where the graph will take place -->
     <div id="my_dataviz"></div>
 
     <script>
+      // References:
+      //  - d3 docs: https://github.com/d3/d3/wiki
+      //  - mdn docs: https://developer.mozilla.org/en-US/
+      //  - Horizontal bar chart in d3.js: https://www.d3-graph-gallery.com/graph/barplot_horizontal.html
+
       // set the dimensions and margins of the graph
-      const margin = { top: 20, right: 30, bottom: 40, left: 90 },
-        width = 600 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom
+      const margin = {top: 20, right: 30, bottom: 40, left: 90},
+          width = 600 - margin.left - margin.right,
+          height = 400 - margin.top - margin.bottom;
 
       // append the svg object to the body of the page
-      const svg = d3
-        .select('#my_dataviz')
-        .append('svg')
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
-        .append('g')
-        .attr('transform', `translate(${margin.left}, ${margin.top})`)
+      const svg = d3.select("#my_dataviz")
+        .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+          .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
       // Parse the Data
-      d3.csv(
-        'https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/7_OneCatOneNum_header.csv'
-      ).then(function (data) {
+      d3.csv("data1.csv").then( function(data) {
+        const bandKey = Object.keys(data[0])[0]
+        const linearKey = Object.keys(data[0])[1]
+
         // Add X axis
-        const x = d3
-          .scaleLinear()
+        const x = d3.scaleLinear()
           // set the upper domain to the maximum in the dataset
-          .domain([0, Math.max(...data.map(d => d.Value))])
-          .range([0, width])
-        svg
-          .append('g')
-          .attr('transform', `translate(0, ${height})`)
+          .domain([0, Math.max(...data.map(d => d[linearKey]))])
+          .range([ 0, width]);
+        svg.append("g")
+          .attr("transform", `translate(0, ${height})`)
           .call(d3.axisBottom(x))
-          .selectAll('text')
-          // .attr("transform", "translate(-10,0)rotate(-45)")
-          .style('text-anchor', 'middle')
+          .selectAll("text")
+            // .attr("transform", "translate(-10,0)rotate(-45)")
+            .style("text-anchor", "middle");
+
 
         // Y axis
-        const y = d3
-          .scaleBand()
-          .range([0, height])
-          .domain(data.map(d => d.Country))
-          .padding(0.2)
-        svg.append('g').call(d3.axisLeft(y))
+        const y = d3.scaleBand()
+          .range([ 0, height ])
+          .domain(data.map(d => d[bandKey]))
+          .padding(.2);
+        svg.append("g")
+          .call(d3.axisLeft(y))
 
         //Bars
-        svg
-          .selectAll()
+        svg.selectAll()
           .data(data)
-          .join('rect')
-          .attr('x', x(0))
-          .attr('y', d => y(d.Country))
-          .attr('width', d => x(d.Value))
-          .attr('height', y.bandwidth())
-          .attr('fill', '#69b3a2')
+          .join("rect")
+          .attr("x", x(0) )
+          .attr("y", d => y(d[bandKey]))
+          .attr("width", d => x(d[linearKey]))
+          .attr("height", y.bandwidth())
+          .attr("fill", "#69b3a2")
       })
+
     </script>
   </body>
 </html>
