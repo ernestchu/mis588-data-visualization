@@ -7,20 +7,24 @@ This repository serves the in-class assignments of MIS 588, which use [D3.js](ht
 - [PA1](PA1/)
 - [PA2](PA2/)
 - [PA3](PA3/)
+- [PA4](PA4/)
 
 ## Local development
 
-### Install [http-server](https://github.com/http-party/http-server),  [prettier](https://prettier.io)
+### Install [http-server](https://github.com/http-party/http-server), [prettier](https://prettier.io)
+
 ```
 yarn
 ```
 
 ### Start http server, you'll need it for D3.js to load local csv files.
+
 ```
 yarn http-server
 ```
 
 ### Lint the code
+
 ```
 yarn prettier --write .
 ```

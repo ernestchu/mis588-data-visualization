@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+  </head>
+  <body>
+    <svg id="my_dataviz" width="600" height="800"></svg>
+    <script>
+      const svg = d3.select('svg'),
+        width = +svg.attr('width'),
+        height = +svg.attr('height')
+
+      // Map and projection
+      const projection = d3
+        .geoMercator()
+        .center([122, 24]) // coordinate to center the map
+        .scale(8000) // scale of the map
+      const path = d3.geoPath(projection)
+
+      // Data and color scale
+      const data = new Map()
+      const colorScale = d3
+        .scaleSequential()
+        .domain([0, 200])
+        .interpolator(d3.interpolateBlues)
+
+      // Load external data and boot
+      Promise.all([
+        d3.json('https://cdn.jsdelivr.net/npm/taiwan-atlas/counties-10t.json'),
+        d3.csv('data4.csv', d => {
+          data.set(d.id, +d.population)
+        })
+      ]).then(loadData => {
+        const taiwan = loadData[0]
+
+        // Draw counties and fill them based on the population
+        svg
+          .selectAll()
+          .data(topojson.feature(taiwan, taiwan.objects.counties).features)
+          .join('path')
+          .attr('d', path)
+          .attr('fill', d => {
+            d.total = data.get(d.properties.COUNTYID) || 0
+            return colorScale(d.total)
+          })
+
+        // Draw borders at once
+        svg
+          .append('path')
+          .datum(topojson.feature(taiwan, taiwan.objects.counties))
+          .style('stroke', 'white')
+          .style('fill', 'none')
+          .attr(
+            'd',
+            path(
+              topojson.mesh(
+                taiwan,
+                taiwan.objects.counties,
+                (a, b) => a !== b // interior boundary only. If an arc is only used by a single geometry then a and b are identical, thus removed.
+              )
+            )
+          )
+      })
+    </script>
+  </body>
+</html>
