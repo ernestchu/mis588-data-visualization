@@ -8,6 +8,7 @@ This repository serves the in-class assignments of MIS 588, which use [D3.js](ht
 - [PA2](PA2/)
 - [PA3](PA3/)
 - [PA4](PA4/)
+- [PA5](PA5/)
 
 ## Local development
 
