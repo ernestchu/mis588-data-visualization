@@ -2,6 +2,12 @@
 
 This repository serves the in-class assignments of MIS 588, which use [D3.js](https://d3js.org).
 
+## Final project: LoL Visualizer
+[LoL-Viz](https://ernestchu.github.io/lol-viz/): Top summoner's statistics and visualizations
+in Challenger League!
+  
+![](lol-viz.jpg)
+
 ## Examples
 
 - [PA1](PA1/)
